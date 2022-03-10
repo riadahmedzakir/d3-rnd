@@ -1,0 +1,35 @@
+/* This sets the color for "TK" nodes to a light blue green. */
+g.type-TK > rect {
+  fill: #00ffd0;
+}
+
+text {
+  font-weight: 300;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+}
+
+.node rect {
+  border-radius: 50%;
+  stroke: #999;
+  fill: #fff;
+  stroke-width: 1.5px;
+}
+
+.edgePath path {
+  stroke: #1190b6;
+  stroke-width: 2px;
+}
+
+/* This styles the title of the tooltip */
+.tipsy .name {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #60b1fc;
+  margin: 0;
+}
+
+/* This styles the body of the tooltip */
+.tipsy .description {
+  font-size: 1.2em;
+}

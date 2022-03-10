@@ -28,3 +28,10 @@
 - d3.schemeCategory20
 - d3.schemeCategory20b
 - d3.schemeCategory20c, etc
+
+
+## Looping with intervals
+## Legends 
+## Formatting & Parsing
+## Tooltip - d3-tip
+## Event listner and handlers

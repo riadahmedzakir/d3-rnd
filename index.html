@@ -8,13 +8,25 @@
     <meta name='viewport' content='width=device-width, initial-scale=1'>
 
     <link rel='stylesheet' type='text/css' media='screen' href='css/style.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='css/d3-tip.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='css/tipsy.css'>
 </head>
 
 <body>
-    <svg id="canvas" width="600" height="600"></svg>
+    <button id="init">Initial state</button>
+    <button id="more">Expand More</button>
+    <p>Selected Node: <span id="selectionText"></span></p>
 
+    <svg id="canvas" width="1000" height="1000">
+    </svg>
+
+    <script src="js/jquery.js"></script>
+    <script src="js/jquery-tipsy.js"></script>
     <script src='js/d3.js'></script>
-    <script src="js/main.js"></script>
+    <script src="js/d3-tip.js"></script>
+    <script src="js/dagree-d3.js"></script>
+    <!-- <script src="js/bar-chart.js"></script> -->
+    <script src="js/graph.js"></script>
 </body>
 
 </html>
