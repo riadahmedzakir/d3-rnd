@@ -14,11 +14,13 @@ text {
   stroke: #999;
   fill: #fff;
   stroke-width: 1.5px;
+  cursor: pointer;
 }
 
 .edgePath path {
   stroke: #1190b6;
   stroke-width: 2px;
+  cursor: pointer;
 }
 
 /* This styles the title of the tooltip */
