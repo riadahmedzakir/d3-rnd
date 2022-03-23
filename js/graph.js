@@ -4,6 +4,15 @@ const render = new dagreD3.render();
 // Set up an SVG group so that we can translate the final graph.
 const svg = d3.select("svg");
 let svgGroup;
+const Tooltip = d3.select("#container")
+    .append("div")
+    .style("opacity", 0)
+    .attr("class", "tooltip")
+// .style("background-color", "white")
+// .style("border", "solid")
+// .style("border-width", "2px")
+// .style("border-radius", "5px")
+// .style("padding", "5px");
 
 function createGraph(nodes) {
     const g = new dagreD3.graphlib.Graph()
@@ -11,7 +20,11 @@ function createGraph(nodes) {
         .setDefaultEdgeLabel(function () { return {}; });
 
     g.graph().transition = function transition(selection) {
-        return selection.transition().duration(1000);
+        return selection
+            .transition()
+            .duration(1000)
+            .ease(d3.easeLinear)
+            .attr("stroke-dashoffset", 0);
     };
 
     nodes.forEach(node => {
@@ -30,14 +43,9 @@ function createGraph(nodes) {
         });
     });
 
-    // g.nodes().forEach(function (v) {
-    //     var node = g.node(v);
-    //     node.customId = "node" + v;
-    // });
-
     g.edges().forEach(function (e) {
         var edge = g.edge(e.v, e.w);
-        edge.customId = e.v + "-" + e.w
+        edge.customId = e.v + "-" + e.w;
     });
 
     g.graph().rankDir = 'LR';
@@ -64,11 +72,44 @@ function draw(g) {
             $('#' + g.edge(d.v, d.w).customId).attr('d', calcPoints(d, g));
         });
 
-    svg.call(zoom);
+    const nodeDrag = d3.drag()
+        .on("start", function (d) {
+            d3.event.sourceEvent.stopPropagation();
+        })
+        .on("drag", function (d) {
+            const node = d3.select(this);
+            const selectedNode = g.node(d);
+            const prevX = selectedNode.x;
+            const prevY = selectedNode.y;
 
-    const styleTooltip = function (name, description) {
-        return "<p class='name'>" + 'Test' + "</p><p class='description'>" + 'Test' + "</p>";
-    };
+            selectedNode.x += d3.event.dx;
+            selectedNode.y += d3.event.dy;
+            node.attr('transform', 'translate(' + selectedNode.x + ',' + selectedNode.y + ')');
+
+            const dx = selectedNode.x - prevX;
+            const dy = selectedNode.y - prevY;
+
+            g.edges().forEach(function (e) {
+                if (e.v == d || e.w == d) {
+                    edge = g.edge(e.v, e.w);
+                    translateEdge(g.edge(e.v, e.w), dx, dy);
+                    $('#' + edge.customId).attr('d', calcPoints(e, g));
+                    label = $('#label_' + edge.customId);
+                    var xforms = label.attr('transform');
+                    if (xforms != "") {
+                        var parts = /translate\(\s*([^\s,)]+)[ ,]?([^\s,)]+)?/.exec(xforms);
+                        var X = parseInt(parts[1]) + dx, Y = parseInt(parts[2]) + dy;
+                        console.log(X, Y);
+                        if (isNaN(Y)) {
+                            Y = dy;
+                        }
+                        label.attr('transform', 'translate(' + X + ',' + Y + ')');
+                    }
+                }
+            })
+        });
+
+    svg.call(zoom);
 
     render(svgGroup, g);
 
@@ -81,25 +122,28 @@ function draw(g) {
         .attr("id", function (e) {
             return e.v + "-" + e.w;
         });
-        
+
     svg.selectAll("g.edgeLabel g")
         .attr("id", function (e) {
             return 'label_' + e.v + "-" + e.w;
         });
 
-    svgGroup.selectAll("g.node")
-        .attr("title", function (v) { return styleTooltip(v, g.node(v).description) })
-        .each(function (v) { $(this).tipsy({ gravity: "w", opacity: 1, html: true }); });
 
     svgGroup.selectAll("g.node")
-        .on('click', function (d) { document.getElementById("selectionText").innerHTML = d });
+        .on('click', function (d) { document.getElementById("selectionText").innerHTML = d })
+        .on("mouseover", tooltipMouseover)
+        .on("mousemove", tooltipMousemove)
+        .on("mouseleave", tooltipMouseleave);
 
+    const nodes = svg.selectAll("g.node");
     const edgePaths = svg.selectAll("g.edgePath");
+
+    nodes.call(nodeDrag);
     edgePaths.call(edgeDrag);
 
     var xCenterOffset = (svg.attr("width") - g.graph().width) / 2;
     svgGroup.attr("transform", "translate(" + xCenterOffset + ", 20)");
-    svg.attr("height", g.graph().height + 40);
+    // svg.attr("height", g.graph().height + 40);
 }
 
 
@@ -194,6 +238,35 @@ function calcPoints(e, g) {
             return d.y;
         })
         .curve(d3.curveBasis)(points);
+}
+
+function tooltipMouseover(d, i, nodes) {
+    Tooltip
+        .transition()
+        .duration(200)
+        .style("opacity", 1);
+
+    d3.select(this)
+        .style("stroke", "black")
+        .style("opacity", 1);
+}
+
+function tooltipMousemove(d) {
+    Tooltip
+        .html("The exact value of<br>this cell is: " + d)
+        .style("left", (d3.event.pageX) + "px")
+        .style("top", (d3.event.pageY - 28) + "px")
+}
+
+function tooltipMouseleave(d) {
+    Tooltip
+        .transition()
+        .duration(500)
+        .style("opacity", 0);
+
+    d3.select(this)
+        .style("stroke", "none")
+        .style("opacity", 0.8);
 }
 
 function init() {
