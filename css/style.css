@@ -48,3 +48,25 @@ text {
   border-radius: 8px;
   pointer-events: none;
 }
+
+.edge-movement {
+  width: 100px;
+  height: 100px;
+  background: red;
+  position: relative;
+  animation: mymove 3s;
+  animation-iteration-count: 100;
+}
+
+@keyframes mymove {
+  from {
+    width: 0px;
+    stroke-dasharray: 0;
+    stroke-dashoffset: 0;
+  }
+  to {
+    width: 100%;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+  }
+}

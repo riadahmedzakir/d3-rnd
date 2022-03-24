@@ -7,12 +7,7 @@ let svgGroup;
 const Tooltip = d3.select("#container")
     .append("div")
     .style("opacity", 0)
-    .attr("class", "tooltip")
-// .style("background-color", "white")
-// .style("border", "solid")
-// .style("border-width", "2px")
-// .style("border-radius", "5px")
-// .style("padding", "5px");
+    .attr("class", "tooltip");
 
 function createGraph(nodes) {
     const g = new dagreD3.graphlib.Graph()
@@ -121,7 +116,16 @@ function draw(g) {
     svg.selectAll("g.edgePath path")
         .attr("id", function (e) {
             return e.v + "-" + e.w;
-        });
+        })
+        .attr("stroke", "darkgrey")
+        .attr("stroke-width", "2")
+        .attr("fill", "none");
+
+    svg.selectAll("g.edgePath path")
+        .attr("id", function (e) {
+            return e.v + "-" + e.w;
+        })
+        .attr("class", "edge-movement");
 
     svg.selectAll("g.edgeLabel g")
         .attr("id", function (e) {
